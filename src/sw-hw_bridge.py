@@ -22,9 +22,6 @@ class SwHwBridgeNode:
         # Non-ROS setup
         self.gripper_controller = GripperController(port="/dev/ttyUSB0",calibration=False)
 
-        self.iterator, self.value1, self.value2 = 0, 0, 0
-        self.motorValue1, self.motorValue2 = 10, -10
-
         self.joint_positions = [0, 0]
 
     # --- Publisher stuff ---
@@ -38,12 +35,8 @@ class SwHwBridgeNode:
 
     def publish_get_joint_angles(self):
         joint_angles_msg = Float32MultiArray()
-        joint_angles_msg.data = [self.value1, self.value2]
-
+        joint_angles_msg.data = [1, -1]
         self.get_joint_angles_pub.publish(joint_angles_msg)
-        self.value1 += self.iterator
-        self.value2 -= self.iterator
-        self.iterator += 1
 
     def publish_get_motor_positions(self):
         motor_positions_msg = Float32MultiArray()
@@ -52,12 +45,8 @@ class SwHwBridgeNode:
 
     def publish_get_motor_statuses(self):
         motor_statuses_msg = Float32MultiArray()
-        motor_statuses_msg.data = [self.motorValue1, self.motorValue2]
-
+        motor_statuses_msg.data = [1, -1]
         self.get_motor_statuses_pub.publish(motor_statuses_msg)
-        self.value1 += self.iterator
-        self.value2 -= self.iterator
-        self.iterator += 1
 
 
     # --- Subscriber stuff ---
