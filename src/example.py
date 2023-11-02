@@ -12,10 +12,9 @@ goalpos = [50, 80]
 
 def main():
     global gc
-    gc = GripperController(port="/dev/ttyUSB0",calibration=False)
-
-    motor_pos_list = gc.get_motor_pos()
-    print(motor_pos_list)
+    gc = GripperController(port="/dev/ttyUSB0",calibration=True)
+    # motor_pos_list = gc.get_motor_pos()
+    # print(motor_pos_list)
 
     # gc.write_desired_joint_angles(goalpos)
 
