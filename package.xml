@@ -2,12 +2,12 @@
 <package format="2">
   <name>sw-hw_bridge</name>
   <version>0.0.0</version>
-  <description>The sw-hw_bridge package</description>
+  <description>The Sw-Hw Bridge package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="robjmal@todo.todo">robjmal</maintainer>
+  <maintainer email="robjmal@gmail.com">Robert Jomar Malate</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
