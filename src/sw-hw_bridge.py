@@ -4,23 +4,40 @@ import rospy
 from std_msgs.msg import String
 from std_msgs.msg import Float32MultiArray
 
-def SwHwBridge():
-    rospy.init_node('sw-hw_bridge', anonymous=True)
-    joint_angles_pub = rospy.Publisher('hand/motors/get_joint_angles', Float32MultiArray, queue_size=10)
-    rate = rospy.Rate(10)  # 10 Hz
+class SwHwBridgeNode:
+    def __init__(self):
+        # Setting up publishers
+        self.get_joint_angles_pub = rospy.Publisher('hand/motors/get_joint_angles', Float32MultiArray, queue_size=10)
 
-    while not rospy.is_shutdown():
-        joint_angles_msg = Float32MultiArray()
-        joint_angles_msg.data = [1.0, 2.0]
-         # Publish the message
+        # Setting up subscribers 
+        self.string_subscriber = rospy.Subscriber('hand/motors/cmd_joint_angles', Float32MultiArray, self.cmd_joint_angles_callback)
+        
+        # Rate setup
+        self.rate = rospy.Rate(5)  # 5 Hz
 
-        rospy.loginfo("Published array: %s", joint_angles_msg.data)
-        joint_angles_pub.publish(joint_angles_msg)
+    # --- Publisher stuff ---
+    def publish_get_joint_angles(self):
+        while not rospy.is_shutdown():
+            joint_angles_msg = Float32MultiArray()
+            joint_angles_msg.data = [1.0, 2.0]
 
-        rate.sleep()
+            self.get_joint_angles_pub.publish(joint_angles_msg)
+            rospy.loginfo("Published array: %s", joint_angles_msg.data)
+    
+            self.rate.sleep()
+
+
+    # --- Subscriber stuff ---
+    def cmd_joint_angles_callback(self, msg):
+        rospy.loginfo(f"Received: {msg.data}")
+        # Here, you can add code to process the received message and possibly influence the publishing behavior.
+
 
 if __name__ == '__main__':
+    rospy.init_node('sw_hw_bridge_node', anonymous=True)
+    node = SwHwBridgeNode()
+
     try:
-        SwHwBridge()
+        node.publish_get_joint_angles()
     except rospy.ROSInterruptException:
         pass
