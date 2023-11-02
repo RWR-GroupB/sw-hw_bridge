@@ -14,17 +14,20 @@ def main():
     global gc
     gc = GripperController(port="/dev/ttyUSB0",calibration=False)
 
-    gc.write_desired_joint_angles(goalpos)
+    motor_pos_list = gc.get_motor_pos()
+    print(motor_pos_list)
 
-    gc.wait_for_motion()
+    # gc.write_desired_joint_angles(goalpos)
 
-    time.sleep(1)
+    # gc.wait_for_motion()
 
-    gc.write_desired_joint_angles(homepos)
+    # time.sleep(1)
 
-    gc.wait_for_motion()
+    # gc.write_desired_joint_angles(homepos)
 
-    time.sleep(1)
+    # gc.wait_for_motion()
+
+    # time.sleep(1)
 
     gc.terminate()
 
