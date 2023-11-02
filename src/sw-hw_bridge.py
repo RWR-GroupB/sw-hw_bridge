@@ -4,6 +4,8 @@ import rospy
 from std_msgs.msg import String
 from std_msgs.msg import Float32MultiArray
 
+from gripper_controller import GripperController
+
 class SwHwBridgeNode:
     def __init__(self):
         # Setting up publishers
@@ -12,12 +14,17 @@ class SwHwBridgeNode:
 
         # Setting up subscribers 
         self.string_subscriber = rospy.Subscriber('hand/motors/cmd_joint_angles', Float32MultiArray, self.cmd_joint_angles_callback)
-        
+
         # Rate setup
         self.rate = rospy.Rate(5)  # 5 Hz
 
+        # Non-ROS setup
+        self.gripper_controller = GripperController(port="/dev/ttyUSB0",calibration=False)
+
         self.iterator, self.value1, self.value2 = 0, 0, 0
         self.motorValue1, self.motorValue2 = 10, -10
+
+        self.joint_positions = [0, 0]
 
     # --- Publisher stuff ---
     def run_publishers(self):
@@ -48,8 +55,11 @@ class SwHwBridgeNode:
 
     # --- Subscriber stuff ---
     def cmd_joint_angles_callback(self, msg):
-        rospy.loginfo(f"Received: {msg.data}")
-        # Here, you can add code to process the received message and possibly influence the publishing behavior.
+        self.joint_positions = msg.data
+
+        self.gripper_controller.write_desired_joint_angles(msg.data)
+        rospy.loginfo(f"Commanding these joint angles: {msg.data}")
+        self.gripper_controller.wait_for_motion()
 
 
 if __name__ == '__main__':
