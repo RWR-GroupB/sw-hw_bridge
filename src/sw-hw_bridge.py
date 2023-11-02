@@ -10,6 +10,7 @@ class SwHwBridgeNode:
     def __init__(self):
         # Setting up publishers
         self.get_joint_angles_pub = rospy.Publisher('hand/motors/get_joint_angles', Float32MultiArray, queue_size=1)
+        self.get_motor_positions_pub = rospy.Publisher('hand/motors/get_motor_positions', Float32MultiArray, queue_size=1)
         self.get_motor_statuses_pub = rospy.Publisher('hand/motors/get_motor_statuses', Float32MultiArray, queue_size=1)
 
         # Setting up subscribers 
@@ -30,6 +31,7 @@ class SwHwBridgeNode:
     def run_publishers(self):
         while not rospy.is_shutdown():
             self.publish_get_joint_angles()
+            self.publish_get_motor_positions()
             self.publish_get_motor_statuses()
 
             self.rate.sleep()
@@ -42,6 +44,11 @@ class SwHwBridgeNode:
         self.value1 += self.iterator
         self.value2 -= self.iterator
         self.iterator += 1
+
+    def publish_get_motor_positions(self):
+        motor_positions_msg = Float32MultiArray()
+        motor_positions_msg.data = self.gripper_controller.get_motor_pos()
+        self.get_motor_positions_pub.publish(motor_positions_msg)
 
     def publish_get_motor_statuses(self):
         motor_statuses_msg = Float32MultiArray()
