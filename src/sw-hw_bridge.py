@@ -15,14 +15,20 @@ class SwHwBridgeNode:
         # Rate setup
         self.rate = rospy.Rate(5)  # 5 Hz
 
+        self.iterator, self.value1, self.value2 = 0, 0, 0
+
     # --- Publisher stuff ---
     def publish_get_joint_angles(self):
         while not rospy.is_shutdown():
             joint_angles_msg = Float32MultiArray()
-            joint_angles_msg.data = [1.0, 2.0]
+            joint_angles_msg.data = [self.value1, self.value2]
 
             self.get_joint_angles_pub.publish(joint_angles_msg)
             rospy.loginfo("Published array: %s", joint_angles_msg.data)
+            
+            self.value1 += self.iterator
+            self.value2 -= self.iterator
+            self.iterator += 1
     
             self.rate.sleep()
 
