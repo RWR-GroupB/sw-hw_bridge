@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>sw-hw_bridge</name>
+  <name>sw-hw_bridge_pkg</name>
   <version>0.0.0</version>
   <description>The Sw-Hw Bridge package</description>
 
