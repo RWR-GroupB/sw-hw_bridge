@@ -54,9 +54,11 @@ class SwHwBridgeNode:
 
 if __name__ == '__main__':
     rospy.init_node('sw_hw_bridge_node', anonymous=True)
-    node = SwHwBridgeNode()
+    sw_hw_bridge_node = SwHwBridgeNode()
+
+    rospy.loginfo("Software-Hardware Bridge node is running")
 
     try:
-        node.run_publishers()
+        sw_hw_bridge_node.run_publishers()
     except rospy.ROSInterruptException:
         pass
