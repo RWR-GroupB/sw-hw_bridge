@@ -1,0 +1,3 @@
+[submodule "src/motor_control"]
+	path = src/motor_control
+	url = git@github.com:RWR-GroupB/motor_control.git

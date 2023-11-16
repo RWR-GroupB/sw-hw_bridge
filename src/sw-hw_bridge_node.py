@@ -4,7 +4,7 @@ import rospy
 from std_msgs.msg import String
 from std_msgs.msg import Float32MultiArray
 
-from gripper_controller import GripperController
+from motor_control.gripper_controller import GripperController
 
 class SwHwBridgeNode:
     def __init__(self):
@@ -55,7 +55,7 @@ class SwHwBridgeNode:
 
         self.gripper_controller.write_desired_joint_angles(msg.data)
         rospy.loginfo(f"Commanding these joint angles: {msg.data}")
-        self.gripper_controller.wait_for_motion()
+        # self.gripper_controller.wait_for_motion()
 
 
 if __name__ == '__main__':
