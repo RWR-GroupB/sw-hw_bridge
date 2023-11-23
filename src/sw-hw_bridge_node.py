@@ -17,7 +17,7 @@ class SwHwBridgeNode:
         self.string_subscriber = rospy.Subscriber('hand/motors/cmd_joint_angles', Float32MultiArray, self.cmd_joint_angles_callback)
 
         # Rate setup
-        self.rate = rospy.Rate(100)  # 100 Hz
+        self.rate = rospy.Rate(20)  # Based on rate that Dynamixel motors communicate
 
         # Non-ROS setup
         self.gripper_controller = GripperController(port="/dev/ttyUSB0",calibration=False)
