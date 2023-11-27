@@ -23,6 +23,18 @@ class SwHwBridgeNode:
         self.gripper_controller = GripperController(port="/dev/ttyUSB0",calibration=False)
 
         self.joint_positions = [0, 0]
+        self.joint_angles = [
+            0.0,    # Thumb Flexion/Extension
+            0.0,    # Thumb Adduction/Abduction
+            0.0,    # Thumb MCP
+            0.0,    # Thumb PIP/DIP
+            0.0,    # Index MCP
+            0.0,    # Index PIP/DIP
+            0.0,    # Middle MCP
+            0.0,    # Middle PIP/DIP
+            0.0,    # Pinky MCP
+            0.0,    # Pinky PIP/DIP
+        ]
 
     # --- Publisher stuff ---
     def run_publishers(self):
@@ -34,13 +46,22 @@ class SwHwBridgeNode:
             self.rate.sleep()
 
     def publish_get_joint_angles(self):
+        # TODO update based on new information
+        current_motor_pos = self.gripper_controller.get_motor_pos()
+        self.joint_angles[4] = current_motor_pos[0]
+        self.joint_angles[5] = current_motor_pos[1]
+
         joint_angles_msg = Float32MultiArray()
-        joint_angles_msg.data = [1, -1]
+        joint_angles_msg.data = self.joint_angles
         self.get_joint_angles_pub.publish(joint_angles_msg)
 
     def publish_get_motor_positions(self):
+        current_motor_pos = self.gripper_controller.get_motor_pos()
+        self.joint_angles[4] = current_motor_pos[0]
+        self.joint_angles[5] = current_motor_pos[1]
+
         motor_positions_msg = Float32MultiArray()
-        motor_positions_msg.data = self.gripper_controller.get_motor_pos()
+        motor_positions_msg.data = self.joint_angles
         self.get_motor_positions_pub.publish(motor_positions_msg)
 
     def publish_get_motor_statuses(self):
