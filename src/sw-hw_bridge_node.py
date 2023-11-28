@@ -20,7 +20,7 @@ class SwHwBridgeNode:
         self.rate = rospy.Rate(20)  # Based on rate that Dynamixel motors communicate
 
         # Non-ROS setup
-        self.gripper_controller = GripperController(port="/dev/ttyUSB0",calibration=False)
+        self.gripper_controller = GripperController(port="/dev/ttyUSB0",calibration=True)
 
         self.joint_positions = [0, 0]
         self.joint_angles = [
@@ -48,17 +48,18 @@ class SwHwBridgeNode:
     def publish_get_joint_angles(self):
         # TODO update based on new information
         current_motor_pos = self.gripper_controller.get_motor_pos()
-        self.joint_angles[4] = current_motor_pos[0]
-        self.joint_angles[5] = current_motor_pos[1]
+        self.joint_angles[0] = current_motor_pos[0]
+        self.joint_angles[1] = current_motor_pos[1]
 
         joint_angles_msg = Float32MultiArray()
         joint_angles_msg.data = self.joint_angles
         self.get_joint_angles_pub.publish(joint_angles_msg)
 
     def publish_get_motor_positions(self):
+        # TODO update based on improved motor mapping 
         current_motor_pos = self.gripper_controller.get_motor_pos()
-        self.joint_angles[4] = current_motor_pos[0]
-        self.joint_angles[5] = current_motor_pos[1]
+        self.joint_angles[0] = current_motor_pos[0]
+        self.joint_angles[1] = current_motor_pos[1]
 
         motor_positions_msg = Float32MultiArray()
         motor_positions_msg.data = self.joint_angles
@@ -72,10 +73,17 @@ class SwHwBridgeNode:
 
     # --- Subscriber stuff ---
     def cmd_joint_angles_callback(self, msg):
-        self.joint_positions = msg.data
+        # self.joint_positions = msg.data
 
-        self.gripper_controller.write_desired_joint_angles(msg.data)
-        rospy.loginfo(f"Commanding these joint angles: {msg.data}")
+        self.joint_angles[0] = msg.data[4]
+        self.joint_angles[1] = msg.data[5]
+        self.joint_angles[2] = msg.data[6]
+        self.joint_angles[3] = msg.data[7]
+        self.joint_angles[4] = msg.data[8]
+        self.joint_angles[5] = msg.data[9]
+
+        self.gripper_controller.write_desired_joint_angles(self.joint_angles)
+        rospy.loginfo(f"Commanding these joint angles: {self.joint_angles}")
         # self.gripper_controller.wait_for_motion()
 
 
