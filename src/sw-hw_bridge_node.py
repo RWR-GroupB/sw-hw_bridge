@@ -45,23 +45,21 @@ class SwHwBridgeNode:
         self.gripper_controller = GripperController(port="/dev/ttyUSB0",calibration=True)
         self.number_of_joints = 9
         self.joint_angles = [0] * self.number_of_joints
+        self.motor_positions = [0] * self.number_of_joints  # equal to number of motors 
 
     # --- Publisher stuff ---
     def run_publishers(self):
         while not rospy.is_shutdown():
-            # self.publish_get_joint_angles()
             self.publish_get_motor_positions()
-            # self.publish_get_motor_statuses()
 
             self.rate.sleep()
 
     def publish_get_motor_positions(self):
-        # TODO update based on improved motor mapping 
         current_motor_pos = self.gripper_controller.get_motor_pos()
-        self.joint_angles = current_motor_pos
+        self.motor_positions = current_motor_pos
 
         motor_positions_msg = Float32MultiArray()
-        motor_positions_msg.data = self.joint_angles
+        motor_positions_msg.data = self.motor_positions
         self.get_motor_positions_pub.publish(motor_positions_msg)
 
     # --- Subscriber stuff ---
