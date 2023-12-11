@@ -68,7 +68,6 @@ class SwHwBridgeNode:
 
         self.gripper_controller.write_desired_joint_angles(self.joint_angles)
         rospy.loginfo(f"Commanding these joint angles: {self.joint_angles}")
-        # self.gripper_controller.wait_for_motion()
 
 
 if __name__ == '__main__':
