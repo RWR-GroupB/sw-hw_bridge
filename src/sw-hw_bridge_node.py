@@ -35,6 +35,7 @@ class SwHwBridgeNode:
     def __init__(self):
         # Setting up publishers
         self.get_motor_positions_pub = rospy.Publisher('hand/motors/get_motor_positions', Float32MultiArray, queue_size=1)
+        self.get_motor_currents_pub = rospy.Publisher('hand/motors/get_motor_currents', Float32MultiArray, queue_size=1)
 
         # Setting up subscribers 
         self.string_subscriber = rospy.Subscriber('hand/motors/cmd_joint_angles', Float32MultiArray, self.cmd_joint_angles_callback)
@@ -47,11 +48,13 @@ class SwHwBridgeNode:
         self.number_of_joints = 9
         self.joint_angles = [0] * self.number_of_joints
         self.motor_positions = [0] * self.number_of_joints  # equal to number of motors 
+        self.motor_currents = [0] * self.number_of_joints
 
     # --- Publisher stuff ---
     def run_publishers(self):
         while not rospy.is_shutdown():
             self.publish_get_motor_positions()
+            self.publish_get_motor_currents()
 
             self.rate.sleep()
 
@@ -62,6 +65,14 @@ class SwHwBridgeNode:
         motor_positions_msg = Float32MultiArray()
         motor_positions_msg.data = self.motor_positions
         self.get_motor_positions_pub.publish(motor_positions_msg)
+
+    def publish_get_motor_currents(self):
+        current_motor_pos = self.gripper_controller.get_motor_cur()
+        self.motor_currents = current_motor_pos
+
+        motor_currents_msg = Float32MultiArray()
+        motor_currents_msg.data = self.motor_currents
+        self.get_motor_currents_pub.publish(motor_currents_msg)
 
     # --- Subscriber stuff ---
     def cmd_joint_angles_callback(self, msg: Float32MultiArray):
