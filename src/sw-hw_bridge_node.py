@@ -3,13 +3,13 @@
 import rospy
 from std_msgs.msg import String
 from std_msgs.msg import Float32MultiArray
-
+import numpy as np
 from motor_control.gripper_controller import GripperController
 
 # Numbers correspond to position in list self.joint_angles and their range limits
 hand_finger_joint_map = {
     'thumb' : {
-        'thumb_adduction-abduction' : (0, (-35, 35)),
+        'thumb_adduction-abduction' : (0, (-25, 25)),
         'thumb_mcp' : (1, (0, 90)),
         'thumb_pip-dip': (2, (0, 90)),
     },
@@ -29,11 +29,13 @@ hand_finger_joint_map = {
         'pinky_pip-dip' : (8, (0, 90)),
     },
 }
-
+lower_limits = [-25,0,0,0,0,0,0,0,0]
+upper_limits = [25,90,90,90,90,90,90,90,90]
 class SwHwBridgeNode:
     def __init__(self):
         # Setting up publishers
         self.get_motor_positions_pub = rospy.Publisher('hand/motors/get_motor_positions', Float32MultiArray, queue_size=1)
+        self.get_motor_currents_pub = rospy.Publisher('hand/motors/get_motor_currents', Float32MultiArray, queue_size=1)
 
         # Setting up subscribers 
         self.string_subscriber = rospy.Subscriber('hand/motors/cmd_joint_angles', Float32MultiArray, self.cmd_joint_angles_callback)
@@ -45,32 +47,40 @@ class SwHwBridgeNode:
         self.gripper_controller = GripperController(port="/dev/ttyUSB0",calibration=True)
         self.number_of_joints = 9
         self.joint_angles = [0] * self.number_of_joints
+        self.motor_positions = [0] * self.number_of_joints  # equal to number of motors 
+        self.motor_currents = [0] * self.number_of_joints
 
     # --- Publisher stuff ---
     def run_publishers(self):
         while not rospy.is_shutdown():
-            # self.publish_get_joint_angles()
             self.publish_get_motor_positions()
-            # self.publish_get_motor_statuses()
+            self.publish_get_motor_currents()
 
             self.rate.sleep()
 
     def publish_get_motor_positions(self):
-        # TODO update based on improved motor mapping 
         current_motor_pos = self.gripper_controller.get_motor_pos()
-        self.joint_angles = current_motor_pos
+        self.motor_positions = current_motor_pos
 
         motor_positions_msg = Float32MultiArray()
-        motor_positions_msg.data = self.joint_angles
+        motor_positions_msg.data = self.motor_positions
         self.get_motor_positions_pub.publish(motor_positions_msg)
+
+    def publish_get_motor_currents(self):
+        current_motor_pos = self.gripper_controller.get_motor_cur()
+        self.motor_currents = current_motor_pos
+
+        motor_currents_msg = Float32MultiArray()
+        motor_currents_msg.data = self.motor_currents
+        self.get_motor_currents_pub.publish(motor_currents_msg)
 
     # --- Subscriber stuff ---
     def cmd_joint_angles_callback(self, msg: Float32MultiArray):
         self.joint_angles = msg.data
+        self.joint_angles = np.clip(self.joint_angles,lower_limits, upper_limits)
 
         self.gripper_controller.write_desired_joint_angles(self.joint_angles)
         rospy.loginfo(f"Commanding these joint angles: {self.joint_angles}")
-        # self.gripper_controller.wait_for_motion()
 
 
 if __name__ == '__main__':
