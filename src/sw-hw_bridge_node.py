@@ -3,13 +3,13 @@
 import rospy
 from std_msgs.msg import String
 from std_msgs.msg import Float32MultiArray
-
+import numpy as np
 from motor_control.gripper_controller import GripperController
 
 # Numbers correspond to position in list self.joint_angles and their range limits
 hand_finger_joint_map = {
     'thumb' : {
-        'thumb_adduction-abduction' : (0, (-35, 35)),
+        'thumb_adduction-abduction' : (0, (-25, 25)),
         'thumb_mcp' : (1, (0, 90)),
         'thumb_pip-dip': (2, (0, 90)),
     },
@@ -29,7 +29,8 @@ hand_finger_joint_map = {
         'pinky_pip-dip' : (8, (0, 90)),
     },
 }
-
+lower_limits = [-25,0,0,0,0,0,0,0,0]
+upper_limits = [25,90,90,90,90,90,90,90,90]
 class SwHwBridgeNode:
     def __init__(self):
         # Setting up publishers
@@ -65,6 +66,7 @@ class SwHwBridgeNode:
     # --- Subscriber stuff ---
     def cmd_joint_angles_callback(self, msg: Float32MultiArray):
         self.joint_angles = msg.data
+        self.joint_angles = np.clip(self.joint_angles,lower_limits, upper_limits)
 
         self.gripper_controller.write_desired_joint_angles(self.joint_angles)
         rospy.loginfo(f"Commanding these joint angles: {self.joint_angles}")
